@@ -479,4 +479,4 @@ $RECYCLE.BIN/
 *.out
 *.app
 
-!/assignment2/output/
+/assignment2/output/
