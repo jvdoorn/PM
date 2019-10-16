@@ -1,0 +1,3 @@
+if ( leeftijd > 60/2 )  {{ 
+      cout << "Oud";
+      

@@ -1,0 +1,3 @@
+  if ( leeftijd > 60/2 )  {{ // ah{a+\\
+   cout << "Oud";// of niet?
+

@@ -1,0 +1,36 @@
+\documentclass[10pt]{article}
+\parindent=0pt
+\usepackage{fullpage}
+\frenchspacing
+\usepackage{microtype}
+\usepackage[english,dutch]{babel}
+\usepackage{listings}
+% Er zijn talloze parameters ...
+\lstset{language=C++, showstringspaces=false, basicstyle=\small,
+  numbers=left, numberstyle=\tiny, numberfirstline=false, breaklines=true,
+  stepnumber=1, tabsize=4,
+  commentstyle=\ttfamily, identifierstyle=\ttfamily,
+  stringstyle=\itshape}
+
+\title{Product}
+\author{Julian van Doorn}
+
+\begin{document}
+
+\selectlanguage{english}
+
+\maketitle
+
+\section{Explanation}
+This program is based on the Python version I wrote (together with Tobias Eikelenboom) for PRna. It aims to provide the functionality described in the assignment 'Product'.
+
+\section{Time}
+Translating the Python code to c++, getting used to c++ and debugging took around 3 hours. Tidying everything up, testing edge cases and writing the report another hour. The time spent on the original program was around 8 hours, a lot of which was spent during work colleges.
+
+\section{Analysis}
+I think the program could be written more efficiently using basic math operations. However, it would of been more effort to find that method than to use my existing code. Had I had more time I would of optimised the program. Moving from Python to c++ was sometimes frustrating as c++ doesn't have as many built in 'ready-to-go' functions as Python does. Par example to simply convert a string or character to lowercase.
+
+\section*{Code}
+\lstinputlisting{main.cpp}
+
+\end{document}
