@@ -22,7 +22,7 @@ class Life {
 
     // These variables keep track of the game state, view, etc.
     int generation = 0; // Which generation we're in.
-    int percentage = 10; // Percentage of alive cells when generating random world.
+    int percentage = 1; // Percentage of alive cells when generating random world.
     int view_x = (width - view_width) / 2; // The x-coordinate of the view (top left).
     int view_y = (height - view_height) / 2; // The y-coordinate of the view (top left).
     int cursor_x = width / 2; // The x-coordinate of the cursor.
@@ -32,7 +32,15 @@ class Life {
     int menu = 0; // 0=main,1=options,2=file
 
     public:
+    void print_edge() {
+        for (int i = 0; i < view_width; i++) {
+            std::cout << edge_character;
+        }
+        std::cout << std::endl;
+    }
+
     void print_world() {
+        print_edge();
         // Last three lines reserved for menu/input and two edges hence the -5 in the next line.
         for (int y = view_y; y < view_y + view_height - 5; y++) {
             for (int x = view_x; x < view_x + view_width; x++) {
@@ -51,13 +59,7 @@ class Life {
 
             std::cout << std::endl;
         }
-    }
-
-    void print_edge() {
-        for (int i = 0; i < view_width; i++) {
-            std::cout << edge_character;
-        }
-        std::cout << std::endl;
+        print_edge();
     }
 
     void print_options() {
@@ -70,16 +72,14 @@ class Life {
         if (menu == 0) {
             std::cout << "(S)top (P)urge (C)lean (O)ptions (R)andom (F)ile (T)oggle (N)ext (G)o:" << std::endl;
         } else if (menu == 1) {
-            std::cout << "Enter file name:" << std::endl;
-        } else {
             std::cout << "Enter an option followed by its value (accepts multiple):" << std::endl;
+        } else if (menu == 2){
+            std::cout << "Enter file name:" << std::endl;
         }
     }
 
-    void print_full() {
-        print_edge();
+    void print() {
         print_world();
-        print_edge();
         print_options();
         print_menu();
     }
@@ -99,6 +99,8 @@ class Life {
     }
 
     void clear(int x1, int x2, int y1, int y2) {
+        generation += 1;
+
         // Clears a specific area of the world.
         for (int y = y1; y < y2; y++) {
             for (int x = x1; x < x2; x++) {
@@ -116,6 +118,8 @@ class Life {
         // Populates the world at random.
         srand(time(nullptr));
 
+        generation += 1;
+
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
                 current_world[x][y] = rand() % 100 < percentage;
@@ -125,6 +129,8 @@ class Life {
 
     void simulate() {
         // Calculates the next generation and then updates the current one.
+        generation += 1;
+
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
                 next_world[x][y] = lives(x, y);
