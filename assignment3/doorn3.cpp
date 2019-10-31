@@ -1,8 +1,9 @@
 #include <iostream>
+#include <fstream>
 
 class Life {
     // These variables define the dimensions of our world.
-    static const int width = 100; // Width of the world
+    static const int width = 1000; // Width of the world
     static const int height = width; // Height of the world
 
     // The next two variables are based on the default Terminal dimensions on Mac OS.
@@ -158,12 +159,134 @@ class Life {
         }
     }
 
+    void extract_integer(std::string &input, int &integer) {
+        std::string number = "0";
+        do {
+            char c = input[0];
+
+            if ('0' <= c && c <= '9') {
+                number += c;
+            } else {
+                integer = std::stoi(number);
+                return;
+            }
+
+            input.erase(0, 1);
+        } while (true);
+
+    }
+
+    void load_file(std::string file_name) {
+        std::ifstream input(file_name);
+
+        if (input.fail()) {
+            std::cout << "fail";
+            return;
+        }
+
+        clear();
+
+        int dx, dy = 0;
+
+        char c;
+        while (input.get(c)) {
+            if (c == ' ') {
+                current_world[cursor_x + dx][cursor_y + dy] = false;
+                dx += 1;
+            } else if (c == '\n') {
+                dy += 1;
+                dx = 0;
+            } else {
+                current_world[cursor_x + dx][cursor_y + dy] = true;
+                dx += 1;
+            }
+        }
+    }
+
     std::string file_menu(std::string input) {
-        return input;
+        std::string file_name;
+
+        do {
+            if (input[0] == ' ' || input[0] == '\n' || input.empty()) {
+                load_file(file_name);
+                menu = 0;
+                input.erase(0, 1);
+                return input;
+            } else {
+                file_name += input[0];
+                input.erase(0, 1);
+            }
+
+        } while (true);
     }
 
     std::string option_menu(std::string input) {
-        return input;
+        do {
+            switch (input[0]) {
+                case 'b':
+                case 'B':
+                    menu = 0;
+                    input.erase(0, 1);
+                    return input;
+                case 'l':
+                case 'L':
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; }
+                    else {
+                        if (input[0] != dead_character) { alive_character = input[0]; }
+                        input.erase(0, 1);
+                        if (input.empty()) { return input; } else { break; }
+                    }
+                case 'd':
+                case 'D':
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; }
+                    else {
+                        if (input[0] != alive_character) { dead_character = input[0]; }
+                        input.erase(0, 1);
+                        if (input.empty()) { return input; } else { break; }
+                    }
+                case 'x':
+                case 'X':
+                    int x;
+                    input.erase(0, 1);
+                    extract_integer(input, x);
+
+                    if (x + view_width > width) {
+                        view_x = width - view_width;
+                    } else {
+                        view_x = x;
+                    }
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 'y':
+                case 'Y':
+                    int y;
+                    input.erase(0, 1);
+                    extract_integer(input, y);
+
+                    if (y + view_height > height) {
+                        view_y = height - view_width;
+                    } else {
+                        view_y = y;
+                    }
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 'g':
+                case 'G':
+                    int g;
+                    input.erase(0, 1);
+                    extract_integer(input, g);
+
+                    go_step = g;
+
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                default:
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; }
+            }
+        } while (true);
     }
 
     std::string main_menu(std::string input) {
@@ -187,22 +310,27 @@ class Life {
                 case 'R':
                     populate();
                     input.erase(0, 1);
-                    if (input.empty()) { return input; } else {break;}
+                    if (input.empty()) { return input; } else { break; }
                 case 'n':
                 case 'N':
                     simulate();
                     input.erase(0, 1);
-                    if (input.empty()) { return input; } else {break;}
+                    if (input.empty()) { return input; } else { break; }
+                case 'g':
+                case 'G':
+                    simulate(go_step);
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
                 case 'p':
                 case 'P':
                     clear();
                     input.erase(0, 1);
-                    if (input.empty()) { return input; } else {break;}
+                    if (input.empty()) { return input; } else { break; }
                 case 'c':
                 case 'C':
                     clear(view_x, view_x + view_width, view_y, view_y + view_height);
                     input.erase(0, 1);
-                    if (input.empty()) { return input; } else {break;}
+                    if (input.empty()) { return input; } else { break; }
                 default:
                     input.erase(0, 1);
                     if (input.empty()) { return input; }
