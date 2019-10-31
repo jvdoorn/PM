@@ -73,7 +73,7 @@ class Life {
             std::cout << "(S)top (P)urge (C)lean (O)ptions (R)andom (F)ile (T)oggle (N)ext (G)o:" << std::endl;
         } else if (menu == 1) {
             std::cout << "Enter an option followed by its value (accepts multiple):" << std::endl;
-        } else if (menu == 2){
+        } else if (menu == 2) {
             std::cout << "Enter file name:" << std::endl;
         }
     }
@@ -158,142 +158,84 @@ class Life {
         }
     }
 
-    void file_menu() {
-        char c;
-        print_menu();
-
-        std::string file_name = "";
-        while (true) {
-            c = std::cin.get();
-
-            if (c == ' ' || c == '\n') {
-                if (file_name.empty()) {
-                    menu = 0;
-                } else {
-                    // load file
-                    file_name = "";
-                    std::cout << file_name;
-                    return;
-                }
-            } else {
-                file_name += c;
-            }
-        }
+    std::string file_menu(std::string input) {
+        return input;
     }
 
-    void option_menu() {
-        char c;
-        print_menu();
-        while (menu == 1) {
-            c = std::cin.get();
-            while (c == '\n') {
-                c = std::cin.get();
-            }
-
-            switch (c) {
-                case 'l':
-                case 'L':
-                    c = std::cin.get();
-
-                    if (c == dead_character) {
-                        dead_character = alive_character;
-                    }
-                    alive_character = c;
-                    continue;
-                case 'd':
-                case 'D':
-                    c = std::cin.get();
-
-                    if (c == alive_character) {
-                        alive_character = dead_character;
-                    }
-                    dead_character = c;
-                    continue;
-                case 'b':
-                case 'B':
-                    menu = 0;
-                    continue;
-            }
-        }
+    std::string option_menu(std::string input) {
+        return input;
     }
 
-    void main_menu() {
-        char c, pc;
-        std::string number = "0";
-
-        while (menu == 0) {
-            print();
-            c = std::cin.get();
-
-            if (pc == 'g') {
-                while (true) {
-                    if ('0' <= c && c <= '9') {
-                        number += c;
-                        c = std::cin.get();
-                    } else {
-                        simulate(std::stoi(number));
-                        number = "0";
-                        break;
-                    }
-                }
-            }
-
-            switch (c) {
+    std::string main_menu(std::string input) {
+        do {
+            switch (input[0]) {
                 case 's':
                 case 'S':
                     menu = -1;
-                    continue;
-                case 'p':
-                case 'P':
-                    clear();
-                    continue;
-                case 'c':
-                case 'C':
-                    clear(view_x, view_x + view_width, view_y, view_y + view_height);
-                    continue;
-                case 'r':
-                case 'R':
-                    populate();
-                    continue;
-                case 't':
-                case 'T':
-                    toggle(cursor_x, cursor_y);
-                    continue;
-                case 'n':
-                case 'N':
-                    simulate();
-                    continue;
+                    return input;
                 case 'o':
                 case 'O':
                     menu = 1;
-                    continue;
+                    input.erase(0, 1);
+                    return input;
                 case 'f':
                 case 'F':
                     menu = 2;
-                    continue;
-                case 'g':
-                case 'G':
-                    pc = 'g';
-                    continue;
+                    input.erase(0, 1);
+                    return input;
+                case 'r':
+                case 'R':
+                    populate();
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else {break;}
+                case 'n':
+                case 'N':
+                    simulate();
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else {break;}
+                case 'p':
+                case 'P':
+                    clear();
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else {break;}
+                case 'c':
+                case 'C':
+                    clear(view_x, view_x + view_width, view_y, view_y + view_height);
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else {break;}
                 default:
-                    continue;
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; }
             }
-        }
+        } while (true);
     }
 
-
-
     void main() {
+        std::string input;
+
+        print();
+
+        char c;
         while (true) {
-            if (menu == 0) {
-                main_menu();
-            } else if (menu == 1) {
-                option_menu();
-            } else if (menu == 2) {
-                file_menu();
+            c = std::cin.get();
+
+            if (c == '\n') {
+                while (!input.empty()) {
+                    if (menu == 0) {
+                        input = main_menu(input);
+                    } else if (menu == 1) {
+                        input = option_menu(input);
+                    } else if (menu == 2) {
+                        input = file_menu(input);
+                    } else if (menu == -1) {
+                        return;
+                    }
+                }
             } else {
-                return;
+                input += c;
             }
+
+            print();
         }
     }
 };
