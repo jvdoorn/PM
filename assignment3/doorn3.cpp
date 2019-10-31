@@ -22,14 +22,14 @@ class Life {
 
     // These variables keep track of the game state, view, etc.
     int generation = 0; // Which generation we're in.
-    int percentage = 1; // Percentage of alive cells when generating random world.
+    int percentage = 25; // Percentage of alive cells when generating random world.
     int view_x = (width - view_width) / 2; // The x-coordinate of the view (top left).
     int view_y = (height - view_height) / 2; // The y-coordinate of the view (top left).
     int cursor_x = width / 2; // The x-coordinate of the cursor.
     int cursor_y = height / 2; // The y-coordinate of the cursor.
     int cursor_step = 1; // How much the cursor is shifted.
     int go_step = 100; // How many generations are generated.
-    int menu = 0; // 0=main,1=options,2=file
+    int menu = 0; // -1=exit,0=main,1=options,2=file
 
     public:
     void print_edge() {
@@ -144,14 +144,162 @@ class Life {
         }
     }
 
+    void simulate(int iterations) {
+        for (int i = 0; i < iterations; i++) {
+            simulate();
+            print();
+        }
+    }
+
     void toggle(int x, int y) {
         // Toggles a specific cell.
         if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
             current_world[x][y] = !current_world[x][y];
         }
     }
+
+    void file_menu() {
+        char c;
+        print_menu();
+
+        std::string file_name = "";
+        while (true) {
+            c = std::cin.get();
+
+            if (c == ' ' || c == '\n') {
+                if (file_name.empty()) {
+                    menu = 0;
+                } else {
+                    // load file
+                    file_name = "";
+                    std::cout << file_name;
+                    return;
+                }
+            } else {
+                file_name += c;
+            }
+        }
+    }
+
+    void option_menu() {
+        char c;
+        print_menu();
+        while (menu == 1) {
+            c = std::cin.get();
+            while (c == '\n') {
+                c = std::cin.get();
+            }
+
+            switch (c) {
+                case 'l':
+                case 'L':
+                    c = std::cin.get();
+
+                    if (c == dead_character) {
+                        dead_character = alive_character;
+                    }
+                    alive_character = c;
+                    continue;
+                case 'd':
+                case 'D':
+                    c = std::cin.get();
+
+                    if (c == alive_character) {
+                        alive_character = dead_character;
+                    }
+                    dead_character = c;
+                    continue;
+                case 'b':
+                case 'B':
+                    menu = 0;
+                    continue;
+            }
+        }
+    }
+
+    void main_menu() {
+        char c, pc;
+        std::string number = "0";
+
+        while (menu == 0) {
+            print();
+            c = std::cin.get();
+
+            if (pc == 'g') {
+                while (true) {
+                    if ('0' <= c && c <= '9') {
+                        number += c;
+                        c = std::cin.get();
+                    } else {
+                        simulate(std::stoi(number));
+                        number = "0";
+                        break;
+                    }
+                }
+            }
+
+            switch (c) {
+                case 's':
+                case 'S':
+                    menu = -1;
+                    continue;
+                case 'p':
+                case 'P':
+                    clear();
+                    continue;
+                case 'c':
+                case 'C':
+                    clear(view_x, view_x + view_width, view_y, view_y + view_height);
+                    continue;
+                case 'r':
+                case 'R':
+                    populate();
+                    continue;
+                case 't':
+                case 'T':
+                    toggle(cursor_x, cursor_y);
+                    continue;
+                case 'n':
+                case 'N':
+                    simulate();
+                    continue;
+                case 'o':
+                case 'O':
+                    menu = 1;
+                    continue;
+                case 'f':
+                case 'F':
+                    menu = 2;
+                    continue;
+                case 'g':
+                case 'G':
+                    pc = 'g';
+                    continue;
+                default:
+                    continue;
+            }
+        }
+    }
+
+
+
+    void main() {
+        while (true) {
+            if (menu == 0) {
+                main_menu();
+            } else if (menu == 1) {
+                option_menu();
+            } else if (menu == 2) {
+                file_menu();
+            } else {
+                return;
+            }
+        }
+    }
 };
 
 int main() {
     Life life; // Our life instance.
+
+    life.main();
 }
