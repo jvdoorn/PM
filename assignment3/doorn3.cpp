@@ -50,7 +50,7 @@ class Life {
                 } else if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
                     std::cout << border_character;
                 } else {
-                    if (current_world[x][y]) {
+                    if (current_world[y][x]) {
                         std::cout << alive_character;
                     } else {
                         std::cout << dead_character;
@@ -90,13 +90,14 @@ class Life {
         int sum = 0;
         for (int dy = -1; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {
-                if (current_world[x + dx][y + dy]) {
+                if (dx == 0 && dy == 0) { continue; }
+                if (current_world[y + dy][x + dx]) {
                     sum += 1;
                 }
             }
         }
 
-        return sum == 2 || sum == 3;
+        return (current_world[y][x] && (sum == 2 || sum == 3)) || (!current_world[y][x] && sum == 3);
     }
 
     void clear(int x1, int x2, int y1, int y2) {
@@ -105,7 +106,7 @@ class Life {
         // Clears a specific area of the world.
         for (int y = y1; y < y2; y++) {
             for (int x = x1; x < x2; x++) {
-                current_world[x][y] = false;
+                current_world[y][x] = false;
             }
         }
     }
@@ -123,7 +124,7 @@ class Life {
 
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
-                current_world[x][y] = rand() % 100 < percentage;
+                current_world[y][x] = rand() % 100 < percentage;
             }
         }
     }
@@ -134,13 +135,13 @@ class Life {
 
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
-                next_world[x][y] = lives(x, y);
+                next_world[y][x] = lives(x, y);
             }
         }
 
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
-                current_world[x][y] = next_world[x][y];
+                current_world[y][x] = next_world[y][x];
             }
         }
     }
@@ -191,13 +192,13 @@ class Life {
         char c;
         while (input.get(c)) {
             if (c == ' ') {
-                current_world[cursor_x + dx][cursor_y + dy] = false;
+                current_world[cursor_y + dy][cursor_x + dx] = false;
                 dx += 1;
             } else if (c == '\n') {
                 dy += 1;
                 dx = 0;
             } else {
-                current_world[cursor_x + dx][cursor_y + dy] = true;
+                current_world[cursor_y + dy][cursor_x + dx] = true;
                 dx += 1;
             }
         }
