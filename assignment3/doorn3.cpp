@@ -124,7 +124,7 @@ class Life {
     bool random() {
         static long value = time(nullptr);
 
-        value = ( 221 * value + 1 ) % 100000;
+        value = (221 * value + 1) % 100000;
         return (value / 1000) < percentage;
     }
 
@@ -170,7 +170,7 @@ class Life {
         }
     }
 
-    void extract_integer(std::string &input, int &integer) {
+    static void extract_integer(std::string &input, int &integer) {
         std::string number = "0";
         do {
             char c = input[0];
@@ -187,7 +187,7 @@ class Life {
 
     }
 
-    void load_file(std::string file_name) {
+    void load_file(const std::string &file_name) {
         std::ifstream input(file_name);
 
         if (input.fail()) {
@@ -197,7 +197,7 @@ class Life {
 
         clear();
 
-        int dx, dy = 0;
+        int dx = 0, dy = 0;
 
         char c;
         while (input.get(c)) {
