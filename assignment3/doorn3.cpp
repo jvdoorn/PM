@@ -327,6 +327,35 @@ class Life {
                     clear();
                     input.erase(0, 1);
                     if (input.empty()) { return input; } else { break; }
+                case 'i':
+                case 'I':
+                    cursor_y -= 1;
+                    if (cursor_y < 0) { cursor_y = 0; }
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 'j':
+                case 'J':
+                    cursor_x -= 1;
+                    if (cursor_x < 0) { cursor_x = 0;}
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 'k':
+                case 'K':
+                    cursor_y += 1;
+                    if (cursor_y > height - 1) { cursor_y = height - 1; }
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 'l':
+                case 'L':
+                    cursor_x += 1;
+                    if (cursor_x > width - 1) { cursor_x = width- 1; }
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
+                case 't':
+                case 'T':
+                    toggle(cursor_x, cursor_y);
+                    input.erase(0, 1);
+                    if (input.empty()) { return input; } else { break; }
                 case 'c':
                 case 'C':
                     clear(view_x, view_x + view_width, view_y, view_y + view_height);
