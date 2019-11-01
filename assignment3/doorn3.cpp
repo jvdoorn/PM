@@ -1,6 +1,11 @@
 #include <iostream>
 #include <fstream>
 
+#define pinput input.erase(0, 1);
+#define pinputre pinput if (input.empty()) { return input; }
+#define pinputr pinput return input;
+#define pinputreb pinputre else { break; }
+
 class Life {
     // These variables define the dimensions of our world.
     static const int width = 1000; // Width of the world
@@ -30,7 +35,7 @@ class Life {
     int cursor_y = height / 2; // The y-coordinate of the cursor.
     int cursor_step = 1; // How much the cursor is shifted.
     int go_step = 100; // How many generations are generated.
-    int menu = 0; // -1=exit,0=main,1=options,2=file
+    int menu = 0; // 0=main,1=options,2=file
 
     public:
     void print_edge() {
@@ -211,11 +216,10 @@ class Life {
             if (input[0] == ' ' || input[0] == '\n' || input.empty()) {
                 load_file(file_name);
                 menu = 0;
-                input.erase(0, 1);
-                return input;
+                pinputr
             } else {
                 file_name += input[0];
-                input.erase(0, 1);
+                pinput
             }
 
         } while (true);
@@ -227,30 +231,25 @@ class Life {
                 case 'b':
                 case 'B':
                     menu = 0;
-                    input.erase(0, 1);
-                    return input;
+                    pinputr
                 case 'l':
                 case 'L':
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; }
+                pinputre
                     else {
                         if (input[0] != dead_character) { alive_character = input[0]; }
-                        input.erase(0, 1);
-                        if (input.empty()) { return input; } else { break; }
+                        pinputreb
                     }
                 case 'd':
                 case 'D':
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; }
+                pinputre
                     else {
                         if (input[0] != alive_character) { dead_character = input[0]; }
-                        input.erase(0, 1);
-                        if (input.empty()) { return input; } else { break; }
+                        pinputreb
                     }
                 case 'x':
                 case 'X':
                     int x;
-                    input.erase(0, 1);
+                    pinput
                     extract_integer(input, x);
 
                     if (x + view_width > width) {
@@ -258,12 +257,11 @@ class Life {
                     } else {
                         view_x = x;
                     }
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'y':
                 case 'Y':
                     int y;
-                    input.erase(0, 1);
+                    pinput
                     extract_integer(input, y);
 
                     if (y + view_height > height) {
@@ -271,21 +269,18 @@ class Life {
                     } else {
                         view_y = y;
                     }
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'g':
                 case 'G':
                     int g;
-                    input.erase(0, 1);
+                    pinput
                     extract_integer(input, g);
 
                     go_step = g;
 
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 default:
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; }
+                pinputre
             }
         } while (true);
     }
@@ -300,70 +295,58 @@ class Life {
                 case 'o':
                 case 'O':
                     menu = 1;
-                    input.erase(0, 1);
-                    return input;
+                    pinputr
                 case 'f':
                 case 'F':
                     menu = 2;
-                    input.erase(0, 1);
-                    return input;
+                    pinputr
                 case 'r':
                 case 'R':
                     populate();
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'n':
                 case 'N':
                     simulate();
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    print();
+                    pinputreb
                 case 'g':
                 case 'G':
                     simulate(go_step);
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'p':
                 case 'P':
                     clear();
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'i':
                 case 'I':
                     cursor_y -= 1;
                     if (cursor_y < 0) { cursor_y = 0; }
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'j':
                 case 'J':
                     cursor_x -= 1;
-                    if (cursor_x < 0) { cursor_x = 0;}
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    if (cursor_x < 0) { cursor_x = 0; }
+                    pinputreb
                 case 'k':
                 case 'K':
                     cursor_y += 1;
                     if (cursor_y > height - 1) { cursor_y = height - 1; }
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'l':
                 case 'L':
                     cursor_x += 1;
-                    if (cursor_x > width - 1) { cursor_x = width- 1; }
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    if (cursor_x > width - 1) { cursor_x = width - 1; }
+                    pinputreb
                 case 't':
                 case 'T':
                     toggle(cursor_x, cursor_y);
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 case 'c':
                 case 'C':
                     clear(view_x, view_x + view_width, view_y, view_y + view_height);
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; } else { break; }
+                    pinputreb
                 default:
-                    input.erase(0, 1);
-                    if (input.empty()) { return input; }
+                pinputr
             }
         } while (true);
     }
@@ -385,7 +368,7 @@ class Life {
                         input = option_menu(input);
                     } else if (menu == 2) {
                         input = file_menu(input);
-                    } else if (menu == -1) {
+                    } else {
                         return;
                     }
                 }
