@@ -24,7 +24,7 @@ class Life {
     char alive_character = '+'; // The character for a living cell.
     char dead_character = ' '; // The character for a dead cell.
     char cursor_character = '@'; // The character for the cursor.
-    char edge_character = '='; // The character for the edge (top/bottom).
+    char bar_character = '='; // The character for the edge (top/bottom).
 
     // These variables keep track of the game state, view, etc.
     int generation = 0; // Which generation we're in.
@@ -38,15 +38,16 @@ class Life {
     int menu = 0; // 0=main,1=options,2=file
 
     public:
-    void print_edge() {
+    void print_bar() {
+        // Prints a bar
         for (int i = 0; i < view_width; i++) {
-            std::cout << edge_character;
+            std::cout << bar_character;
         }
         std::cout << std::endl;
     }
 
     void print_world() {
-        print_edge();
+        print_bar();
         // Last three lines reserved for menu/input and two edges hence the -5 in the next line.
         for (int y = view_y; y < view_y + view_height - 5; y++) {
             for (int x = view_x; x < view_x + view_width; x++) {
@@ -65,7 +66,7 @@ class Life {
 
             std::cout << std::endl;
         }
-        print_edge();
+        print_bar();
     }
 
     void print_options() {
@@ -78,9 +79,9 @@ class Life {
         if (menu == 0) {
             std::cout << "(S)top (P)urge (C)lean (O)ptions (R)andom (F)ile (T)oggle (N)ext (G)o:" << std::endl;
         } else if (menu == 1) {
-            std::cout << "Enter an option followed by its value (accepts multiple):" << std::endl;
+            std::cout << "(B)ack (L/D)character (X/Y/G)integer:" << std::endl;
         } else if (menu == 2) {
-            std::cout << "Enter file name:" << std::endl;
+            std::cout << "Enter file name (leave empty to return:" << std::endl;
         }
     }
 
@@ -91,24 +92,28 @@ class Life {
     }
 
     bool lives(int x, int y) {
-        // Determines if a cell will live in the next generation (a.k.a. if it has 2 or 3 neighbours).
-        int sum = 0;
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                if (dx == 0 && dy == 0) { continue; }
-                if (current_world[y + dy][x + dx]) {
-                    sum += 1;
+        // Determines if a cell will live in the next generation
+        if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
+            return false; // The border is always dead
+        } else {
+            int sum = 0;
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    if (dx == 0 && dy == 0) { continue; }
+                    if (current_world[y + dy][x + dx]) {
+                        sum += 1;
+                    }
                 }
             }
-        }
 
-        return (current_world[y][x] && (sum == 2 || sum == 3)) || (!current_world[y][x] && sum == 3);
+            return (current_world[y][x] && (sum == 2 || sum == 3)) || (!current_world[y][x] && sum == 3);
+        }
     }
 
     void clear(int x1, int x2, int y1, int y2) {
+        // Clears a specific area of the world.
         generation += 1;
 
-        // Clears a specific area of the world.
         for (int y = y1; y < y2; y++) {
             for (int x = x1; x < x2; x++) {
                 current_world[y][x] = false;
@@ -157,6 +162,7 @@ class Life {
     }
 
     void simulate(int iterations) {
+        // Simulate one generation
         for (int i = 0; i < iterations; i++) {
             simulate();
             print();
@@ -164,13 +170,14 @@ class Life {
     }
 
     void toggle(int x, int y) {
-        // Toggles a specific cell.
+        // Toggles a specific cell (excluding border cells)
         if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
             current_world[y][x] = !current_world[y][x];
         }
     }
 
     static void extract_integer(std::string &input, int &integer) {
+        // Extracts an integer from a string
         std::string number = "0";
         do {
             char c = input[0];
