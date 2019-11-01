@@ -121,15 +121,20 @@ class Life {
         clear(1, width - 1, 1, height - 1);
     }
 
+    bool random() {
+        static long value = time(nullptr);
+
+        value = ( 221 * value + 1 ) % 100000;
+        return (value / 1000) < percentage;
+    }
+
     void populate() {
         // Populates the world at random.
-        srand(time(nullptr));
-
         generation += 1;
 
         for (int y = 1; y < height - 1; y++) {
             for (int x = 1; x < width - 1; x++) {
-                current_world[y][x] = rand() % 100 < percentage;
+                current_world[y][x] = random();
             }
         }
     }
@@ -319,22 +324,22 @@ class Life {
                     pinputreb
                 case 'i':
                 case 'I':
-                    cursor_y -= 1;
+                    cursor_y -= cursor_step;
                     if (cursor_y < 0) { cursor_y = 0; }
                     pinputreb
                 case 'j':
                 case 'J':
-                    cursor_x -= 1;
+                    cursor_x -= cursor_step;
                     if (cursor_x < 0) { cursor_x = 0; }
                     pinputreb
                 case 'k':
                 case 'K':
-                    cursor_y += 1;
+                    cursor_y += cursor_step;
                     if (cursor_y > height - 1) { cursor_y = height - 1; }
                     pinputreb
                 case 'l':
                 case 'L':
-                    cursor_x += 1;
+                    cursor_x += cursor_step;
                     if (cursor_x > width - 1) { cursor_x = width - 1; }
                     pinputreb
                 case 't':
