@@ -156,7 +156,7 @@ class Life {
     void toggle(int x, int y) {
         // Toggles a specific cell.
         if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
-            current_world[x][y] = !current_world[x][y];
+            current_world[y][x] = !current_world[y][x];
         }
     }
 
