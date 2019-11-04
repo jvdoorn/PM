@@ -1,3 +1,18 @@
+/*
+ * doorn3.cpp
+ *
+ * Assignment 3: Life
+ * Author: Julian van Doorn (2518074)
+ *
+ * This is an implementation of Conway's Game of Life. It furthermore aims to provide
+ * additional functionality as specified in assignment 3. It has 3 menus: main, options
+ * and file.
+ *
+ * Last edited on: Monday November 4th 2019
+ * Compiled using cmake version 3.15.3 on macOS 10.15
+ *
+ */
+
 #include <iostream>
 #include <fstream>
 
@@ -28,7 +43,7 @@ class Life {
 
     // These variables keep track of the game state, view, etc.
     int generation = 0; // Which generation we're in.
-    int percentage = 25; // Percentage of alive cells when generating random world.
+    int percentage = 20; // Percentage of alive cells when generating random world.
     int view_x = (width - view_width) / 2; // The x-coordinate of the view (top left).
     int view_y = (height - view_height) / 2; // The y-coordinate of the view (top left).
     int cursor_x = width / 2; // The x-coordinate of the cursor.
@@ -70,18 +85,18 @@ class Life {
     }
 
     void print_options() {
-        std::cout << "GEN " << generation << ", x=" << view_x << ", y=" << view_y << ", g=" << go_step << ", cx="
-                  << cursor_x << ", cy=" << cursor_y << ", l='" << alive_character << "', d='" << dead_character << "'"
-                  << std::endl;
+        std::cout << "GEN " << generation << ", x=" << view_x << ", y=" << view_y << ", g=" << go_step << ", r="
+                  << percentage << ", cx=" << cursor_x << ", cy=" << cursor_y << ", l='" << alive_character << "', d='"
+                  << dead_character << "'" << std::endl;
     }
 
     void print_menu() {
         if (menu == 0) {
             std::cout << "(S)top (P)urge (C)lean (O)ptions (R)andom (F)ile (T)oggle (N)ext (G)o:" << std::endl;
         } else if (menu == 1) {
-            std::cout << "(B)ack (L/D)character (X/Y/G)integer:" << std::endl;
+            std::cout << "(B)ack (L/D)character (X/Y/G/S/R)integer:" << std::endl;
         } else if (menu == 2) {
-            std::cout << "Enter file name (leave empty to return:" << std::endl;
+            std::cout << "Enter file name (leave empty to return):" << std::endl;
         }
     }
 
@@ -184,21 +199,28 @@ class Life {
 
             if ('0' <= c && c <= '9') {
                 number += c;
+                pinput
             } else {
                 integer = std::stoi(number);
                 return;
             }
-
-            input.erase(0, 1);
         } while (true);
+    }
 
+    static void extract_integer(std::string &input, int &integer, int min, int max) {
+        extract_integer(input, integer);
+
+        if (integer < min) {
+            integer = min;
+        } else if (integer > max) {
+            integer = max;
+        }
     }
 
     void load_file(const std::string &file_name) {
         std::ifstream input(file_name);
 
         if (input.fail()) {
-            std::cout << "fail";
             return;
         }
 
@@ -233,7 +255,6 @@ class Life {
                 file_name += input[0];
                 pinput
             }
-
         } while (true);
     }
 
@@ -260,37 +281,29 @@ class Life {
                     }
                 case 'x':
                 case 'X':
-                    int x;
                     pinput
-                    extract_integer(input, x);
-
-                    if (x + view_width > width) {
-                        view_x = width - view_width;
-                    } else {
-                        view_x = x;
-                    }
-                    pinputreb
+                    extract_integer(input, view_x, 0, width - view_width);
+                    break;
                 case 'y':
                 case 'Y':
-                    int y;
                     pinput
-                    extract_integer(input, y);
-
-                    if (y + view_height > height) {
-                        view_y = height - view_width;
-                    } else {
-                        view_y = y;
-                    }
-                    pinputreb
+                    extract_integer(input, view_y, 0, height - view_height);
+                    break;
                 case 'g':
                 case 'G':
-                    int g;
                     pinput
-                    extract_integer(input, g);
-
-                    go_step = g;
-
-                    pinputreb
+                    extract_integer(input, go_step, 0, 250);
+                    break;
+                case 's':
+                case 'S':
+                    pinput
+                    extract_integer(input, cursor_step, 1, 5);
+                    break;
+                case 'r':
+                case 'R':
+                    pinput
+                    extract_integer(input, percentage, 0, 100);
+                    break;
                 default:
                 pinputre
             }
