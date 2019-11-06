@@ -17,8 +17,8 @@
 #include <fstream>
 
 #define pinput input.erase(0, 1);
-#define pinputre pinput if (input.empty()) { return input; }
-#define pinputr pinput return input;
+#define pinputre pinput if (input.empty()) { return; }
+#define pinputr pinput return;
 #define pinputreb pinputre else { break; }
 
 class Life {
@@ -177,7 +177,7 @@ class Life {
     }
 
     void simulate(int iterations) {
-        // Simulate one generation
+        // Simulate X generations
         for (int i = 0; i < iterations; i++) {
             simulate();
             print();
@@ -191,8 +191,17 @@ class Life {
         }
     }
 
-    static void extract_integer(std::string &input, int &integer) {
-        // Extracts an integer from a string
+    static void set_int(int &integer, int value, int min, int max) {
+        if (value < min) {
+            integer = min;
+        } else if (value > max) {
+            integer = max;
+        } else {
+            integer = value;
+        }
+    }
+
+    static void extract_integer(std::string &input, int &integer, int min, int max) {
         std::string number = "0";
         do {
             char c = input[0];
@@ -201,20 +210,10 @@ class Life {
                 number += c;
                 pinput
             } else {
-                integer = std::stoi(number);
+                set_int(integer, std::stoi(number), min, max);
                 return;
             }
         } while (true);
-    }
-
-    static void extract_integer(std::string &input, int &integer, int min, int max) {
-        extract_integer(input, integer);
-
-        if (integer < min) {
-            integer = min;
-        } else if (integer > max) {
-            integer = max;
-        }
     }
 
     void load_file(const std::string &file_name) {
@@ -243,7 +242,7 @@ class Life {
         }
     }
 
-    std::string file_menu(std::string input) {
+    void file_menu(std::string &input) {
         std::string file_name;
 
         do {
@@ -258,7 +257,7 @@ class Life {
         } while (true);
     }
 
-    std::string option_menu(std::string input) {
+    void option_menu(std::string &input) {
         do {
             switch (input[0]) {
                 case 'b':
@@ -310,13 +309,13 @@ class Life {
         } while (true);
     }
 
-    std::string main_menu(std::string input) {
+    void main_menu(std::string &input) {
         do {
             switch (input[0]) {
                 case 's':
                 case 'S':
                     menu = -1;
-                    return input;
+                    return;
                 case 'o':
                 case 'O':
                     menu = 1;
@@ -344,23 +343,19 @@ class Life {
                     pinputreb
                 case 'i':
                 case 'I':
-                    cursor_y -= cursor_step;
-                    if (cursor_y < 0) { cursor_y = 0; }
+                    set_int(cursor_y, cursor_y - cursor_step, 0, height);
                     pinputreb
                 case 'j':
                 case 'J':
-                    cursor_x -= cursor_step;
-                    if (cursor_x < 0) { cursor_x = 0; }
+                    set_int(cursor_x, cursor_x - cursor_step, 0, width);
                     pinputreb
                 case 'k':
                 case 'K':
-                    cursor_y += cursor_step;
-                    if (cursor_y > height - 1) { cursor_y = height - 1; }
+                    set_int(cursor_y, cursor_y + cursor_step, 0, height - 1);
                     pinputreb
                 case 'l':
                 case 'L':
-                    cursor_x += cursor_step;
-                    if (cursor_x > width - 1) { cursor_x = width - 1; }
+                    set_int(cursor_x, cursor_x + cursor_step, 0, width - 1);
                     pinputreb
                 case 't':
                 case 'T':
@@ -388,11 +383,11 @@ class Life {
             if (c == '\n') {
                 while (!input.empty()) {
                     if (menu == 0) {
-                        input = main_menu(input);
+                        main_menu(input);
                     } else if (menu == 1) {
-                        input = option_menu(input);
+                        option_menu(input);
                     } else if (menu == 2) {
-                        input = file_menu(input);
+                        file_menu(input);
                     } else {
                         return;
                     }
