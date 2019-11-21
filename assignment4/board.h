@@ -6,7 +6,7 @@ class Field {
 
 class Board {
     private:
-    Field *start;
+    Field *start = nullptr;
 
     int height;
     int width;
@@ -15,17 +15,26 @@ class Board {
     bool player1;
     bool player2;
 
-    char player1char;
-    char player2char;
+    char player1char = 'W';
+    char player2char = 'Z';
 
-    bool turn;
+    bool turn = false;
+    int turns = 0;
+
+    bool full();
+
+    int score(Field* target, int direction);
+
+    bool check(int x, int y);
 
     public:
-    Board();
+    Board(int _height, int _width, int _amount, bool _player1, bool _player2);
 
     void print();
 
     void construct();
 
-    bool set(int w, int h, char value);
+    bool set(int x, int y, char value);
+
+    Field* get(int x, int y);
 };

@@ -1,24 +1,18 @@
 #include <iostream>
 #include "board.h"
 
-Board::Board() {
-    start = nullptr;
 
-    height = 10;
-    width = 10;
-    amount = 1;
+Board::Board(int _height, int _width, int _amount, bool _player1, bool _player2) {
+    height = _height;
+    width = _width;
+    amount = _amount;
 
-    player1 = true;
-    player2 = true;
-
-    player1char = 'W';
-    player2char = 'Z';
-
-    turn = true;
+    player1 = _player1;
+    player2 = _player2;
 }
 
 void Board::construct() {
-    Field *previous_row = nullptr;
+    Field *previous_row_start = nullptr;
     Field *row_start = nullptr;
     Field *previous = nullptr;
     Field *current = nullptr;
@@ -27,12 +21,12 @@ void Board::construct() {
         for (int col = 0; col < width; col++) {
             current = new Field;
 
-            if (row == 0 and col == 0) {
-                start = current;
-            }
             if (col == 0) {
                 row_start = current;
-                previous = current;
+
+                if (row == 0) {
+                    start = current;
+                }
             } else {
                 // Connect us to our left neighbour
                 current->neighbours[3] = previous;
@@ -40,7 +34,7 @@ void Board::construct() {
             }
 
             if (row > 0) {
-                Field *above = previous_row;
+                Field *above = previous_row_start;
                 for (int i = 0; i < col; i++) {
                     above = above->neighbours[4];
                 }
@@ -59,25 +53,30 @@ void Board::construct() {
             }
             previous = current;
         }
-        previous_row = row_start;
+        previous_row_start = row_start;
     }
 }
 
-bool Board::set(int w, int h, char value) {
+Field *Board::get(int x, int y) {
     Field *target = start;
 
-    if (w > width - 1 || h > height - 1) {
-        return false;
+    if (x > width - 1 || y > height - 1) {
+        return nullptr;
     }
 
-    for (int y = 0; y < h; y++) {
+    for (int i = 0; i < y; i++) {
         target = target->neighbours[6];
     }
-    for (int x = 0; x < w; x++) {
+    for (int i = 0; i < x; i++) {
         target = target->neighbours[4];
     }
 
-    if (target->value != ' ') {
+    return target;
+}
+
+bool Board::set(int x, int y, char value) {
+    Field *target = get(x, y);
+    if (target == nullptr) {
         return false;
     }
 
@@ -98,4 +97,34 @@ void Board::print() {
         std::cout << std::endl;
         row = row->neighbours[6];
     }
+}
+
+bool Board::full() {
+    return turns >= width * height;
+}
+
+int Board::score(Field *target, int direction) {
+    int score = 0;
+
+    Field *next = target->neighbours[direction];
+    while (next->value == target->value) {
+        score += 1;
+        if (next->neighbours[direction] == nullptr) {
+            break;
+        }
+    }
+    return score;
+}
+
+bool Board::check(int x, int y) {
+    Field *target = get(x, y);
+    if (target == nullptr || target->value == ' ') {
+        return false;
+    }
+
+    return score(target, 0) + score(target, 7) + 1 >= amount ||
+           score(target, 1) + score(target, 6) + 1 >= amount ||
+           score(target, 2) + score(target, 5) + 1 >= amount ||
+           score(target, 3) + score(target, 4) + 1 >= amount;
+
 }

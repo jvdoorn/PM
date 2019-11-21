@@ -1,7 +1,7 @@
 #include "board.h"
 
 int main() {
-    Board board;
+    Board board = Board(10, 10, 3, true, false);
 
     board.construct();
 
