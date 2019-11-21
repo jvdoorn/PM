@@ -1,6 +1,6 @@
-all: main.o goboard.o
-	g++ -Wall -o doorn4 goboard.o main.o
-goboard.o: goboard.cpp goboard.h
-	g++ -Wall -c goboard.cpp
-main.o: main.cpp goboard.h
+all: main.o board.o
+	g++ -Wall -o doorn4 board.o main.o
+board.o: board.cpp board.h
+	g++ -Wall -c board.cpp
+main.o: main.cpp board.h
 	g++ -Wall -c main.cpp
