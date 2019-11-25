@@ -60,7 +60,7 @@ void Board::construct() {
 Field *Board::get(int x, int y) {
     Field *target = start;
 
-    if (x > width - 1 || y > height - 1) {
+    if (x > width - 1 || y > height - 1 || x < 0 || y < 0) {
         return nullptr;
     }
 
@@ -74,28 +74,73 @@ Field *Board::get(int x, int y) {
     return target;
 }
 
-bool Board::set(int x, int y, char value) {
+bool Board::set(int x, int y, int value) {
     Field *target = get(x, y);
     if (target == nullptr) {
         return false;
     }
 
-    target->value = value;
-    return true;
+    switch (value) {
+        case 1:
+            target->value = player1char;
+            turns++;
+            return true;
+        case 2:
+            target->value = player2char;
+            turns++;
+            return true;
+        default:
+            target->value = ' ';
+            turns--;
+            return true;
+    }
 }
 
 void Board::print() {
     Field *row = start;
 
+    std::string s1 = "\n";
+    std::string s2 = "\n";
+    std::string s3 = "\n";
+
+    for (int i = width - 1; i >= 0; i--) {
+        std::string si = std::to_string(i);
+        si.reserve();
+
+        if (i > 99) {
+            s1 = si[2] + s1;
+            s2 = si[1] + s2;
+            s3 = si[0] + s3;
+        } else if (i > 9) {
+            s1 = " " + s1;
+            s2 = si[1] + s2;
+            s3 = si[0] + s3;
+        } else {
+            s1 = " " + s1;
+            s2 = " " + s2;
+            s3 = si[0] + s3;
+        }
+
+        s1 = " " + s1;
+        s2 = " " + s2;
+        s3 = " " + s3;
+    }
+
+    std::cout << "  " << s1 << "  " << s2 << "  " << s3;
+
+    int r = 0;
     while (row != nullptr) {
         Field *col = row;
 
+        printf("%3d", r);
         while (col != nullptr) {
             std::cout << col->value << ' ';
             col = col->neighbours[4];
         }
         std::cout << std::endl;
         row = row->neighbours[6];
+
+        r++;
     }
 }
 
@@ -105,6 +150,10 @@ bool Board::full() {
 
 int Board::score(Field *target, int direction) {
     int score = 0;
+
+    if (target->neighbours[direction] == nullptr) {
+        return score;
+    }
 
     Field *next = target->neighbours[direction];
     while (next->value == target->value) {

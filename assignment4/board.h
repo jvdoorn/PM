@@ -15,8 +15,8 @@ class Board {
     bool player1;
     bool player2;
 
-    char player1char = 'W';
-    char player2char = 'Z';
+    char player1char = 'B';
+    char player2char = 'W';
 
     bool turn = false;
     int turns = 0;
@@ -34,7 +34,7 @@ class Board {
 
     void construct();
 
-    bool set(int x, int y, char value);
+    bool set(int x, int y, int value);
 
     Field* get(int x, int y);
 };
