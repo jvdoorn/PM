@@ -76,7 +76,7 @@ Field *Board::get(int x, int y) {
 
 bool Board::set(int x, int y, char value) {
     Field *target = get(x, y);
-    if (target == nullptr || target->value != ' ') {
+    if (target == nullptr || (target->value != ' ' && value != ' ')) {
         return false;
     }
 
@@ -165,12 +165,27 @@ bool Board::check(int x, int y) {
 
 }
 
-void Board::user_controls(int &x, int &y) {
+void Board::user_controls(int &x, int &y, bool &q) {
     std::cout << "Enter x-coordinate or negative number for options: ";
     std::cin >> x;
 
     if (x < 0) {
-        //TODO: give menu options
+        int m;
+        std::cout << "1) Quit 2) Back 3) Undo: ";
+        std::cin >> m;
+
+        switch (m) {
+            case 1:
+                q = true;
+                break;
+            case 2:
+                break;
+            case 3:
+                undo(2);
+                break;
+            default:
+                break;
+        }
     } else {
         std::cout << "Enter y-coordinate: ";
         std::cin >> y;
@@ -199,17 +214,22 @@ void Board::play() {
     while (true) {
         int x;
         int y;
+        bool q = false;
 
         if ((player1 && !turn) || (player2 && turn)) {
             print();
 
-            user_controls(x, y);
+            user_controls(x, y, q);
+            if (q) {
+                return;
+            }
         } else {
             computer_controls(x, y);
         }
 
         if (set(x, y, !turn ? player1char : player2char)) {
-            // TODO: add to history
+            save(x, y);
+
             if (check(x, y)) {
                 if (!turn) {
                     std::cout << "Player one has won.";
@@ -228,4 +248,27 @@ void Board::play() {
             std::cout << "Failed to do action.";
         }
     }
+}
+
+void Board::save(int x, int y) {
+    last_action = new Action(x, y, last_action);
+}
+
+void Board::undo(int times) {
+    for (int i = 0; i < times; i++) {
+        Action *p = last_action;
+        if (p == nullptr) {
+            return;
+        }
+        set(p->x, p->y, ' ');
+
+        last_action = p->previous;
+        delete p;
+    }
+}
+
+Action::Action(int _x, int _y, Action *_previous) {
+    x = _x;
+    y = _y;
+    previous = _previous;
 }
