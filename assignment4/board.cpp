@@ -74,26 +74,19 @@ Field *Board::get(int x, int y) {
     return target;
 }
 
-bool Board::set(int x, int y, int value) {
+bool Board::set(int x, int y, char value) {
     Field *target = get(x, y);
-    if (target == nullptr) {
+    if (target == nullptr || target->value != ' ') {
         return false;
     }
 
-    switch (value) {
-        case 1:
-            target->value = player1char;
-            turns++;
-            return true;
-        case 2:
-            target->value = player2char;
-            turns++;
-            return true;
-        default:
-            target->value = ' ';
-            turns--;
-            return true;
+    target->value = value;
+    if (value == ' ') {
+        turns--;
+    } else {
+        turns++;
     }
+    return true;
 }
 
 void Board::print() {
@@ -145,29 +138,23 @@ void Board::print() {
 }
 
 bool Board::full() {
-    return turns >= width * height;
+    return turns == width * height;
 }
 
 int Board::score(Field *target, int direction) {
     int score = 0;
 
-    if (target->neighbours[direction] == nullptr) {
-        return score;
-    }
-
     Field *next = target->neighbours[direction];
-    while (next->value == target->value) {
+    while (next != nullptr && next->value == target->value) {
         score += 1;
-        if (next->neighbours[direction] == nullptr) {
-            break;
-        }
+        next = next->neighbours[direction];
     }
     return score;
 }
 
 bool Board::check(int x, int y) {
     Field *target = get(x, y);
-    if (target == nullptr || target->value == ' ') {
+    if (target == nullptr) {
         return false;
     }
 
@@ -176,4 +163,69 @@ bool Board::check(int x, int y) {
            score(target, 2) + score(target, 5) + 1 >= amount ||
            score(target, 3) + score(target, 4) + 1 >= amount;
 
+}
+
+void Board::user_controls(int &x, int &y) {
+    std::cout << "Enter x-coordinate or negative number for options: ";
+    std::cin >> x;
+
+    if (x < 0) {
+        //TODO: give menu options
+    } else {
+        std::cout << "Enter y-coordinate: ";
+        std::cin >> y;
+    }
+}
+
+void Board::computer_controls(int &x, int &y) {
+    srand(time(nullptr));
+
+    int ty;
+    int tx;
+
+    while (true) {
+        ty = rand() % height;
+        tx = rand() % width;
+
+        if (get(tx, ty)->value == ' ') {
+            x = tx;
+            y = ty;
+            return;
+        }
+    }
+}
+
+void Board::play() {
+    while (true) {
+        int x;
+        int y;
+
+        if ((player1 && !turn) || (player2 && turn)) {
+            print();
+
+            user_controls(x, y);
+        } else {
+            computer_controls(x, y);
+        }
+
+        if (set(x, y, !turn ? player1char : player2char)) {
+            // TODO: add to history
+            if (check(x, y)) {
+                if (!turn) {
+                    std::cout << "Player one has won.";
+                } else {
+                    std::cout << "Player two has won.";
+                }
+                return;
+            } else if (full()) {
+                print();
+                std::cout << "There is a tie.";
+                return;
+            }
+
+            turn = !turn;
+        } else {
+            std::cout << "Failed to do action.";
+        }
+    }
 }

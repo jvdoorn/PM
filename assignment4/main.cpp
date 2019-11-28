@@ -26,16 +26,11 @@ int main() {
 //    _player2 = is_affirmative(_holder);
 //
 //    Board board = Board(_height, _width, _amount, _player1, _player2);
-    Board board = Board(20, 20, 5, true, true);
+    Board board = Board(10, 10, 4, true, false);
 
     board.construct();
 
-    board.set(0, 0, 1);
-    board.set(1, 1, 1);
-    board.set(3, 4, 1);
-    board.set(9, 8, 2);
-
-    board.print();
+    board.play();
 
     return 0;
 }

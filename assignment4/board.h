@@ -23,7 +23,7 @@ class Board {
 
     bool full();
 
-    int score(Field* target, int direction);
+    int score(Field *target, int direction);
 
     bool check(int x, int y);
 
@@ -34,7 +34,13 @@ class Board {
 
     void construct();
 
-    bool set(int x, int y, int value);
+    bool set(int x, int y, char value);
 
-    Field* get(int x, int y);
+    Field *get(int x, int y);
+
+    void user_controls(int &x, int &y);
+
+    void computer_controls(int &x, int &y);
+
+    void play();
 };
