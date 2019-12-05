@@ -7,6 +7,7 @@ class Field {
 class Action {
     public:
     Action(int _x, int _y, Action *_previous);
+
     int x;
     int y;
     Action *previous = nullptr;
@@ -30,18 +31,19 @@ class Board {
     bool turn = false;
     int turns = 0;
 
+    int filled();
+
     bool full();
 
     int score(Field *target, int direction);
 
     bool check(int x, int y);
 
-    public:
-    Board(int _height, int _width, int _amount, bool _player1, bool _player2);
+    void user_controls(int &x, int &y, bool &q);
+
+    void computer_controls(int &x, int &y);
 
     void print();
-
-    void construct();
 
     bool set(int x, int y, char value);
 
@@ -51,9 +53,16 @@ class Board {
 
     void undo(int times);
 
-    void user_controls(int &x, int &y, bool &q);
+    void deconstruct_history();
 
-    void computer_controls(int &x, int &y);
+    public:
+    Board(int _height, int _width, int _amount, bool _player1, bool _player2);
 
-    void play();
+    void construct();
+
+    void deconstruct();
+
+    bool play(bool &_winner, bool &_won, int &_turns);
+
+    void clean();
 };

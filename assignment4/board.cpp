@@ -81,11 +81,6 @@ bool Board::set(int x, int y, char value) {
     }
 
     target->value = value;
-    if (value == ' ') {
-        turns--;
-    } else {
-        turns++;
-    }
     return true;
 }
 
@@ -137,8 +132,12 @@ void Board::print() {
     }
 }
 
+int Board::filled() {
+    return turns;
+}
+
 bool Board::full() {
-    return turns == width * height;
+    return filled() == width * height;
 }
 
 int Board::score(Field *target, int direction) {
@@ -193,8 +192,6 @@ void Board::user_controls(int &x, int &y, bool &q) {
 }
 
 void Board::computer_controls(int &x, int &y) {
-    srand(time(nullptr));
-
     int ty;
     int tx;
 
@@ -210,7 +207,7 @@ void Board::computer_controls(int &x, int &y) {
     }
 }
 
-void Board::play() {
+bool Board::play(bool &_winner, bool &_won, int &_turns) {
     while (true) {
         int x;
         int y;
@@ -220,27 +217,26 @@ void Board::play() {
             print();
 
             user_controls(x, y, q);
-            if (q) {
-                return;
-            }
+            if (q) { return true; }
         } else {
             computer_controls(x, y);
         }
 
         if (set(x, y, !turn ? player1char : player2char)) {
+            turns++;
             save(x, y);
 
             if (check(x, y)) {
-                if (!turn) {
-                    std::cout << "Player one has won.";
-                } else {
-                    std::cout << "Player two has won.";
-                }
-                return;
+                _winner = turn;
+                _won = true;
+                _turns = turns;
+
+                return false;
             } else if (full()) {
-                print();
-                std::cout << "There is a tie.";
-                return;
+                _won = false;
+                _turns = turns;
+
+                return false;
             }
 
             turn = !turn;
@@ -248,6 +244,44 @@ void Board::play() {
             std::cout << "Failed to do action.";
         }
     }
+}
+
+
+void Board::deconstruct_history() {
+    Action *p = last_action;
+    Action *n;
+    while (p != nullptr) {
+        n = p->previous;
+        delete (p);
+        p = n;
+    }
+
+    last_action = nullptr;
+}
+
+void Board::clean() {
+    turns = 0;
+    turn = false;
+
+    deconstruct_history();
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            set(x, y, ' ');
+        }
+    }
+}
+
+void Board::deconstruct() {
+    deconstruct_history();
+
+    for (int y = height - 1; y >= 0; y--) {
+        for (int x = width - 1; x >= 0; x--) {
+            delete get(x, y);
+        }
+    }
+
+    start = nullptr;
 }
 
 void Board::save(int x, int y) {
@@ -261,6 +295,7 @@ void Board::undo(int times) {
             return;
         }
         set(p->x, p->y, ' ');
+        turns--;
 
         last_action = p->previous;
         delete p;
