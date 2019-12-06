@@ -39,7 +39,7 @@ class Board {
 
     bool check(int x, int y);
 
-    void user_controls(int &x, int &y, bool &q);
+    void user_controls(int &x, int &y, bool &q, bool &c);
 
     void computer_controls(int &x, int &y);
 
@@ -65,4 +65,6 @@ class Board {
     bool play(bool &_winner, bool &_won, int &_turns);
 
     void clean();
+
+    int calculate();
 };

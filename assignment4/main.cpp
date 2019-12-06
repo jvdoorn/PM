@@ -6,13 +6,9 @@ bool is_affirmative(const std::string &value) {
            value == "y";
 }
 
-int main() {
-    srand(time(nullptr));
-    // TODO: info block
-
-    int height, width, amount, count;
+void query_options(int &height, int &width, int &amount, bool &player1, bool &player2, int &count) {
     std::string holder;
-    bool player1, player2;
+
     std::cout << "What will be the height of the board: ";
     std::cin >> height;
     std::cout << "What will be the width of the board: ";
@@ -27,9 +23,26 @@ int main() {
     player2 = is_affirmative(holder);
     std::cout << "How many games do you want to play: ";
     std::cin >> count;
+}
+
+int main() {
+    srand(time(nullptr));
+
+    std::cout << "================================================" << std::endl
+              << "|n-on-a-row                                    |" << std::endl
+              << "|Author: Julian van Doorn (s2518074)           |" << std::endl
+              << "|The program will ask you for a couple settings|" << std::endl
+              << "|and then lets you play or simulate the game.  |" << std::endl
+              << "|                                              |" << std::endl
+              << "|Date: 6 December 2019                         |" << std::endl
+              << "================================================" << std::endl;
+
+    int height, width, amount, count;
+    bool player1, player2;
+
+    query_options(height, width, amount, player1, player2, count);
 
     Board board = Board(height, width, amount, player1, player2);
-
     board.construct();
 
     bool forced;
@@ -67,11 +80,15 @@ int main() {
         board.clean();
     }
 
-    std::cout << "Player one has won " << p1_wins << " times and player two " << p2_wins << " times." << std::endl;
-    std::cout << "There were " << ties << " ties." << std::endl;
-    std::cout << "Turn statistics: " << std::endl << "Turns : amount" << std::endl;
-    for (int i = 0; i < width * height; i++) {
-        printf("%5d : %d \n", i + 1, turns_keeper[i]);
+    if (!player1 && !player2) {
+        std::cout << std::endl;
+        std::cout << "Player one has won " << p1_wins << " times and player two " << p2_wins << " times." << std::endl;
+        std::cout << "There were " << ties << " ties." << std::endl;
+
+        std::cout << "Turn statistics: " << std::endl << "Turns : amount" << std::endl;
+        for (int i = 0; i < width * height; i++) {
+            printf("%5d : %d \n", i + 1, turns_keeper[i]);
+        }
     }
 
     board.deconstruct();

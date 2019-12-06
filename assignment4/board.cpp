@@ -164,13 +164,13 @@ bool Board::check(int x, int y) {
 
 }
 
-void Board::user_controls(int &x, int &y, bool &q) {
+void Board::user_controls(int &x, int &y, bool &q, bool &c) {
     std::cout << "Enter x-coordinate or negative number for options: ";
     std::cin >> x;
 
     if (x < 0) {
         int m;
-        std::cout << "1) Quit 2) Back 3) Undo: ";
+        std::cout << "1) Quit 2) Back 3) Undo 4) calculate: ";
         std::cin >> m;
 
         switch (m) {
@@ -181,6 +181,10 @@ void Board::user_controls(int &x, int &y, bool &q) {
                 break;
             case 3:
                 undo(2);
+                break;
+            case 4:
+                std::cout << calculate() << " possible games from this point.";
+                c = true;
                 break;
             default:
                 break;
@@ -212,12 +216,13 @@ bool Board::play(bool &_winner, bool &_won, int &_turns) {
         int x;
         int y;
         bool q = false;
+        bool c = false;
 
         if ((player1 && !turn) || (player2 && turn)) {
             print();
 
-            user_controls(x, y, q);
-            if (q) { return true; }
+            user_controls(x, y, q, c);
+            if (q) { return true; } else if (c) { c = false; continue; }
         } else {
             computer_controls(x, y);
         }
@@ -245,7 +250,6 @@ bool Board::play(bool &_winner, bool &_won, int &_turns) {
         }
     }
 }
-
 
 void Board::deconstruct_history() {
     Action *p = last_action;
@@ -296,10 +300,37 @@ void Board::undo(int times) {
         }
         set(p->x, p->y, ' ');
         turns--;
+        turn = !turn;
 
         last_action = p->previous;
         delete p;
     }
+}
+
+int Board::calculate() {
+    int count = 0;
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            Field *p = get(x, y);
+
+            if (p->value == ' ') {
+                set(x, y, !turn ? player1char : player2char);
+                save(x, y);
+                turn = !turn;
+
+                if (full() || check(x, y)) {
+                    count += 1;
+                } else {
+                    count += calculate();
+                }
+
+                undo(1);
+            }
+        }
+    }
+
+    return count;
 }
 
 Action::Action(int _x, int _y, Action *_previous) {
