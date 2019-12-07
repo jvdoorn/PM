@@ -66,5 +66,5 @@ class Board {
 
     void clean();
 
-    int calculate();
+    long calculate();
 };

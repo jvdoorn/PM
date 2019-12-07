@@ -307,8 +307,8 @@ void Board::undo(int times) {
     }
 }
 
-int Board::calculate() {
-    int count = 0;
+long Board::calculate() {
+    long count = 0;
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
@@ -317,15 +317,16 @@ int Board::calculate() {
             if (p->value == ' ') {
                 set(x, y, !turn ? player1char : player2char);
                 save(x, y);
+                turns += 1;
                 turn = !turn;
 
                 if (full() || check(x, y)) {
+                    undo(1);
                     count += 1;
                 } else {
                     count += calculate();
+                    undo(1);
                 }
-
-                undo(1);
             }
         }
     }
