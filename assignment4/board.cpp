@@ -1,3 +1,9 @@
+/*
+ * board.cpp
+ *
+ * Last edited on: Sunday December 8th 2019
+ */
+
 #include <iostream>
 #include "board.h"
 
@@ -9,17 +15,19 @@ Board::Board(int _height, int _width, int _amount, bool _player1, bool _player2)
 
     player1 = _player1;
     player2 = _player2;
+
+    turns_keeper = new int[width * height];
 }
 
 void Board::construct() {
-    Field *previous_row_start = nullptr;
-    Field *row_start = nullptr;
-    Field *previous = nullptr;
-    Field *current = nullptr;
+    Field *previous_row_start = nullptr; // Previous row
+    Field *row_start = nullptr; // Current row
+    Field *previous = nullptr; // Previous field
+    Field *current = nullptr; // Current field
 
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
-            current = new Field;
+            current = new Field; // Create a new field
 
             if (col == 0) {
                 row_start = current;
@@ -34,8 +42,9 @@ void Board::construct() {
             }
 
             if (row > 0) {
-                Field *above = previous_row_start;
+                Field *above = previous_row_start; // The field above us
                 for (int i = 0; i < col; i++) {
+                    // Take the i-th element in the row above
                     above = above->neighbours[4];
                 }
 
@@ -44,12 +53,11 @@ void Board::construct() {
                 current->neighbours[1] = above;
                 current->neighbours[2] = above->neighbours[4];
 
-                if (row != 0) {
-                    // Connect our upper neighbours to us and our direct (left/right) neighbours
-                    above->neighbours[5] = current->neighbours[3];
-                    above->neighbours[6] = current;
-                    above->neighbours[7] = current->neighbours[4];
-                }
+                // Connect our upper neighbours to us and our direct (left/right) neighbours
+                above->neighbours[5] = current->neighbours[3];
+                above->neighbours[6] = current;
+                above->neighbours[7] = current->neighbours[4];
+
             }
             previous = current;
         }
@@ -58,16 +66,18 @@ void Board::construct() {
 }
 
 Field *Board::get(int x, int y) {
-    Field *target = start;
+    Field *target = start; // The target field
 
     if (x > width - 1 || y > height - 1 || x < 0 || y < 0) {
-        return nullptr;
+        return nullptr; // Field does not exist
     }
 
     for (int i = 0; i < y; i++) {
+        // Move down
         target = target->neighbours[6];
     }
     for (int i = 0; i < x; i++) {
+        // Move to the right
         target = target->neighbours[4];
     }
 
@@ -75,60 +85,60 @@ Field *Board::get(int x, int y) {
 }
 
 bool Board::set(int x, int y, char value) {
-    Field *target = get(x, y);
+    Field *target = get(x, y); // Get the target
     if (target == nullptr || (target->value != ' ' && value != ' ')) {
-        return false;
+        return false; // Failed to update
     }
 
     target->value = value;
-    return true;
+    return true; // Successfully updated
 }
 
 void Board::print() {
     Field *row = start;
 
-    std::string s1 = "\n";
-    std::string s2 = "\n";
-    std::string s3 = "\n";
+    std::string s1 = "\n", s2 = "\n", s3 = "\n";
 
+    // Creates strings for our x coordinates.
     for (int i = width - 1; i >= 0; i--) {
         std::string si = std::to_string(i);
-        si.reserve();
 
         if (i > 99) {
-            s1 = si[2] + s1;
-            s2 = si[1] + s2;
-            s3 = si[0] + s3;
+            s1.insert(0, 1, si[2]);
+            s2.insert(0, 1, si[1]);
+            s3.insert(0, 1, si[0]);
         } else if (i > 9) {
-            s1 = " " + s1;
-            s2 = si[1] + s2;
-            s3 = si[0] + s3;
+            s1.insert(0, 1, ' ');
+            s2.insert(0, 1, si[1]);
+            s3.insert(0, 1, si[0]);
         } else {
-            s1 = " " + s1;
-            s2 = " " + s2;
-            s3 = si[0] + s3;
+            s1.insert(0, 1, ' ');
+            s2.insert(0, 1, ' ');
+            s3.insert(0, 1, si[0]);
         }
 
-        s1 = " " + s1;
-        s2 = " " + s2;
-        s3 = " " + s3;
+        // Spacing between the numbers on x axis
+        s1.insert(0, 1, ' ');
+        s2.insert(0, 1, ' ');
+        s3.insert(0, 1, ' ');
     }
 
+    // Print the x axis
     std::cout << "  " << s1 << "  " << s2 << "  " << s3;
 
+    // Print the y axis and all the field values
     int r = 0;
     while (row != nullptr) {
         Field *col = row;
 
-        printf("%3d", r);
+        printf("%3d", r); // y axis
         while (col != nullptr) {
-            std::cout << col->value << ' ';
-            col = col->neighbours[4];
+            std::cout << col->value << ' '; // Print field
+            col = col->neighbours[4]; // Go to the next
         }
-        std::cout << std::endl;
-        row = row->neighbours[6];
-
-        r++;
+        std::cout << std::endl; // Newline
+        row = row->neighbours[6]; // Go to next row
+        r++; // Increment for y axis
     }
 }
 
@@ -141,12 +151,12 @@ bool Board::full() {
 }
 
 int Board::score(Field *target, int direction) {
-    int score = 0;
+    int score = 0; // The score in the given direction
 
     Field *next = target->neighbours[direction];
     while (next != nullptr && next->value == target->value) {
-        score += 1;
-        next = next->neighbours[direction];
+        score++; // Increment score
+        next = next->neighbours[direction]; // Go to the next field
     }
     return score;
 }
@@ -169,22 +179,22 @@ void Board::user_controls(int &x, int &y, bool &q, bool &c) {
     std::cin >> x;
 
     if (x < 0) {
-        int m;
+        // Give menu options
         std::cout << "1) Quit 2) Back 3) Undo 4) calculate: ";
-        std::cin >> m;
+        std::cin >> y;
 
-        switch (m) {
+        c = true; // Tells the game we had a menu (avoid calling set())
+        switch (y) {
             case 1:
-                q = true;
+                q = true; // Quit the game
                 break;
             case 2:
-                break;
+                break; // Continue with the game
             case 3:
-                undo(2);
+                undo(2); // Undo twice (to their previous turn)
                 break;
             case 4:
                 std::cout << calculate() << " possible games from this point.";
-                c = true;
                 break;
             default:
                 break;
@@ -196,33 +206,53 @@ void Board::user_controls(int &x, int &y, bool &q, bool &c) {
 }
 
 void Board::computer_controls(int &x, int &y) {
-    int ty;
-    int tx;
-
     while (true) {
-        ty = rand() % height;
-        tx = rand() % width;
+        y = rand() % height;
+        x = rand() % width;
 
-        if (get(tx, ty)->value == ' ') {
-            x = tx;
-            y = ty;
+        if (get(x, y)->value == ' ') {
             return;
         }
     }
 }
 
-bool Board::play(bool &_winner, bool &_won, int &_turns) {
-    while (true) {
-        int x;
-        int y;
-        bool q = false;
-        bool c = false;
+void Board::print_result(bool won) {
+    if (!won) {
+        std::cout << "There was a tie after " << turns << " turns." << std::endl;
+    } else if (!turn) {
+        std::cout << "Player one has won after " << turns << " turns." << std::endl;
+    } else {
+        std::cout << "Player two has won after " << turns << " turns." << std::endl;
+    }
+}
 
+void Board::print_summary() {
+    std::cout << std::endl;
+    std::cout << "Player one has won " << p1_wins << " times and player two " << p2_wins << " times." << std::endl;
+    std::cout << "There were " << ties << " ties." << std::endl;
+
+    std::cout << "Turn statistics: " << std::endl << "Turns : amount" << std::endl;
+    for (int i = 0; i < width * height; i++) {
+        // Print the amount of games that took n turns
+        printf("%5d : %d \n", i + 1, turns_keeper[i]);
+    }
+}
+
+void Board::play() {
+    int x, y; // Coordinates
+    bool q = false, c = false; // Quit/continue flags
+
+    while (true) {
         if ((player1 && !turn) || (player2 && turn)) {
             print();
 
             user_controls(x, y, q, c);
-            if (q) { return true; } else if (c) { c = false; continue; }
+            if (q) {
+                return; // Quit
+            } else if (c) {
+                c = false;
+                continue; // Avoid failing an action
+            }
         } else {
             computer_controls(x, y);
         }
@@ -232,16 +262,15 @@ bool Board::play(bool &_winner, bool &_won, int &_turns) {
             save(x, y);
 
             if (check(x, y)) {
-                _winner = turn;
-                _won = true;
-                _turns = turns;
-
-                return false;
+                print_result(true);
+                turns_keeper[turns - 1] += 1; // Increment turn
+                !turn ? p1_wins++ : p2_wins++; // Increment wins
+                return;
             } else if (full()) {
-                _won = false;
-                _turns = turns;
-
-                return false;
+                print_result(false);
+                turns_keeper[turns - 1]++; // Increment turn
+                ties++; // Increment ties
+                return;
             }
 
             turn = !turn;
@@ -265,13 +294,13 @@ void Board::deconstruct_history() {
 
 void Board::clean() {
     turns = 0;
-    turn = false;
+    turn = false; // Player 1 turn again
 
     deconstruct_history();
 
     for (int x = 0; x < width; x++) {
         for (int y = 0; y < height; y++) {
-            set(x, y, ' ');
+            set(x, y, ' '); // Clear the board
         }
     }
 }
@@ -284,6 +313,9 @@ void Board::deconstruct() {
             delete get(x, y);
         }
     }
+
+    turns_keeper = {nullptr};
+    p1_wins = 0, p2_wins = 0, ties = 0;
 
     start = nullptr;
 }
@@ -299,7 +331,7 @@ void Board::undo(int times) {
             return;
         }
         set(p->x, p->y, ' ');
-        turns--;
+        turns--; // We undid a turn so decrement
         turn = !turn;
 
         last_action = p->previous;
@@ -321,9 +353,11 @@ long Board::calculate() {
                 turn = !turn;
 
                 if (full() || check(x, y)) {
+                    // We reached a final state
                     undo(1);
                     count += 1;
                 } else {
+                    // Recursive call
                     count += calculate();
                     undo(1);
                 }
@@ -335,6 +369,10 @@ long Board::calculate() {
 }
 
 Action::Action(int _x, int _y, Action *_previous) {
+    /**
+     * Constructor of the Action class, should be
+     * self explanatory.
+     */
     x = _x;
     y = _y;
     previous = _previous;

@@ -1,12 +1,47 @@
+/*
+ * main.cpp
+ *
+ * Assignment 4: n-on-a-row
+ * Author: Julian van Doorn (2518074)
+ *
+ * This is a game called n-on-a-row. It allows you to play yourself
+ * or simulate games. It also provides additional functionality as
+ * described in the task.
+ *
+ * Last edited on: Sunday December 8th 2019
+ * Compiled using cmake version 3.15.3 on macOS 10.15
+ *
+ */
+
 #include <iostream>
 #include "board.h"
 
 bool is_affirmative(const std::string &value) {
+    /**
+     * Checks if an input is affirmative.
+     */
     return value == "Y" ||
            value == "y";
 }
 
+void print_description() {
+    /**
+     * Print a description of the game.
+     */
+    std::cout << "================================================" << std::endl
+              << "|n-on-a-row                                    |" << std::endl
+              << "|Author: Julian van Doorn (s2518074)           |" << std::endl
+              << "|The program will ask you for a couple settings|" << std::endl
+              << "|and then lets you play or simulate the game.  |" << std::endl
+              << "|                                              |" << std::endl
+              << "|Date: 8 December 2019                         |" << std::endl
+              << "================================================" << std::endl;
+}
+
 void query_options(int &height, int &width, int &amount, bool &player1, bool &player2, int &count) {
+    /**
+     * Query the user for the game settings.
+     */
     std::string holder;
 
     std::cout << "What will be the height of the board: ";
@@ -26,16 +61,12 @@ void query_options(int &height, int &width, int &amount, bool &player1, bool &pl
 }
 
 int main() {
+    /**
+     * Main function.
+     */
     srand(time(nullptr));
 
-    std::cout << "================================================" << std::endl
-              << "|n-on-a-row                                    |" << std::endl
-              << "|Author: Julian van Doorn (s2518074)           |" << std::endl
-              << "|The program will ask you for a couple settings|" << std::endl
-              << "|and then lets you play or simulate the game.  |" << std::endl
-              << "|                                              |" << std::endl
-              << "|Date: 6 December 2019                         |" << std::endl
-              << "================================================" << std::endl;
+    print_description();
 
     int height, width, amount, count;
     bool player1, player2;
@@ -45,50 +76,13 @@ int main() {
     Board board = Board(height, width, amount, player1, player2);
     board.construct();
 
-    bool forced;
-    bool winner = false;
-    bool won = false;
-    int turns = 0;
-
-    int *turns_keeper = new int[width * height];
-    int p1_wins = 0;
-    int p2_wins = 0;
-    int ties = 0;
-
     for (int i = 0; i < count; i++) {
-        forced = board.play(winner, won, turns);
-
-        if (!forced) {
-            if (won) {
-                if (!winner) {
-                    std::cout << "Player one has won after " << turns << " turns." << std::endl;
-                    p1_wins += 1;
-                } else {
-                    std::cout << "Player two has won after " << turns << " turns." << std::endl;
-                    p2_wins += 1;
-                }
-            } else {
-                std::cout << "There was a tie after " << turns << " turns." << std::endl;
-                ties += 1;
-            }
-
-            turns_keeper[turns - 1] += 1;
-        } else {
-            break;
-        }
-
+        board.play();
         board.clean();
     }
 
     if (!player1 && !player2) {
-        std::cout << std::endl;
-        std::cout << "Player one has won " << p1_wins << " times and player two " << p2_wins << " times." << std::endl;
-        std::cout << "There were " << ties << " ties." << std::endl;
-
-        std::cout << "Turn statistics: " << std::endl << "Turns : amount" << std::endl;
-        for (int i = 0; i < width * height; i++) {
-            printf("%5d : %d \n", i + 1, turns_keeper[i]);
-        }
+        board.print_summary();
     }
 
     board.deconstruct();
