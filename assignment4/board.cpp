@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include "board.h"
 
 
@@ -227,15 +228,24 @@ void Board::print_result(bool won) {
 }
 
 void Board::print_summary() {
+    std::ofstream data_file;
+    std::string file_name = "summary-" + std::to_string(width) + "x" + std::to_string(height) + ".dat";
+
+    data_file.open(file_name, std::ios::trunc);
+
     std::cout << std::endl;
     std::cout << "Player one has won " << p1_wins << " times and player two " << p2_wins << " times." << std::endl;
     std::cout << "There were " << ties << " ties." << std::endl;
 
     std::cout << "Turn statistics: " << std::endl << "Turns : amount" << std::endl;
+    data_file << "# Turns Amount" << "\n";
     for (int i = 0; i < width * height; i++) {
         // Print the amount of games that took n turns
         printf("%5d : %d \n", i + 1, turns_keeper[i]);
+        data_file << i + 1 << " " << turns_keeper[i] << "\n";
     }
+
+    data_file.close();
 }
 
 void Board::play() {
@@ -314,7 +324,7 @@ void Board::deconstruct() {
         }
     }
 
-    turns_keeper = {nullptr};
+    turns_keeper = nullptr;
     p1_wins = 0, p2_wins = 0, ties = 0;
 
     start = nullptr;

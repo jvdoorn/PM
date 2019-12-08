@@ -61,7 +61,7 @@ class Board {
      * Calculates the score of field in  a given
      * direction.
      */
-    int score(Field *target, int direction);
+    static int score(Field *target, int direction);
 
     /**
      * Check if the given field at x, y has
@@ -120,6 +120,11 @@ class Board {
      */
     void deconstruct_history();
 
+    /**
+     * Calculate the remaining games.
+     */
+    long calculate();
+
     public:
     /**
      * Constructor of the Board class, should
@@ -133,7 +138,8 @@ class Board {
     void construct();
 
     /**
-     * Prints a summary of the set of games.
+     * Prints a summary of the set of games and
+     * saves the results to a file.
      */
     void print_summary();
 
@@ -154,9 +160,4 @@ class Board {
      * Cleans the board for a new game.
      */
     void clean();
-
-    /**
-     * Calculate the remaining games.
-     */
-    long calculate();
 };
